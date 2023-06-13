@@ -1,7 +1,7 @@
 use enum_repr::EnumRepr;
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::Decimal;
+use cosmwasm_std::{Coin, Decimal};
 use osmosis_router::{OsmosisSimulateSwapResponse, OsmosisSwapMsg};
 use osmosis_std::types::osmosis::gamm::v1beta1::SwapAmountInRoute;
 use osmosis_std_derive::CosmwasmExt;
@@ -15,6 +15,10 @@ pub enum ExecuteMsg {
     SwapWithAction {
         swap_msg: OsmosisSwapMsg,
         after_swap_action: AfterSwapAction,
+        local_fallback_address: String,
+    },
+    MultiSwap {
+        swaps: Vec<MultiSwapMsg>,
         local_fallback_address: String,
     },
 }
@@ -52,10 +56,18 @@ pub enum AfterSwapAction {
     },
 }
 
+#[cw_serde]
+pub struct MultiSwapMsg {
+    pub amount_in: Coin,
+    pub swap_msg: OsmosisSwapMsg,
+    pub after_swap_action: AfterSwapAction,
+}
+
 #[EnumRepr(type = "u64")]
 pub enum MsgReplyId {
     Swap = 1,
     IbcTransfer = 2,
+    MultiSwap = 3,
 }
 
 #[cw_serde]

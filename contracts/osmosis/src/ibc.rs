@@ -9,6 +9,8 @@ pub fn receive_ack(
     success: bool,
 ) -> Result<Response, ContractError> {
     if success {
+        // need to load awaiting transfer in order to remove it
+        let _ = load_awaiting_ibc_transfer_optional(deps.storage, &source_channel, sequence)?;
         return Ok(Response::new());
     }
 

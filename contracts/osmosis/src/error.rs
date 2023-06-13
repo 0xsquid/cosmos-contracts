@@ -24,4 +24,10 @@ pub enum ContractError {
 
     #[error("Ibc transfer failed: {msg:?}")]
     FailedIBCTransfer { msg: String },
+
+    #[error("Invalid amount of multi-swap calls. Must be non-zero")]
+    InvalidAmountOfSwaps {},
+
+    #[error("contract locked: {msg}")]
+    ContractLocked { msg: String },
 }
