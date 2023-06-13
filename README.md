@@ -16,5 +16,5 @@ The contract also handles fallback scenarios for ibc-transfers, in case of packe
 
 ### Testnet contract address:
 ```
-osmo142uuupve7a5rdrapwdpky290axljcr45m54qdk22jr8ad22u3jrsafgz3v
+osmo1zl9ztmwe2wcdvv9std8xn06mdaqaqm789rutmazfh3z869zcax4sv0ctqw
 ```
