@@ -41,6 +41,9 @@ pub enum SudoMsg {
 }
 
 #[cw_serde]
+pub struct MigrateMsg {}
+
+#[cw_serde]
 pub enum AfterSwapAction {
     BankSend {
         receiver: String,

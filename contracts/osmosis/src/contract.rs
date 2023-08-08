@@ -8,7 +8,9 @@ use cosmwasm_std::{
 use crate::commands::{self};
 use crate::error::ContractError;
 use crate::ibc;
-use crate::msg::{ExecuteMsg, IBCLifecycleComplete, InstantiateMsg, MsgReplyId, QueryMsg, SudoMsg};
+use crate::msg::{
+    ExecuteMsg, IBCLifecycleComplete, InstantiateMsg, MigrateMsg, MsgReplyId, QueryMsg, SudoMsg,
+};
 
 /*
 // version info for migration info
@@ -92,4 +94,9 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
             .unwrap(),
         ),
     }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(_deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, ContractError> {
+    Ok(Response::default())
 }

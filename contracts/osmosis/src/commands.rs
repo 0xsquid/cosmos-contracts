@@ -25,7 +25,7 @@ use crate::{
 
 const TRANSFER_PORT: &'static str = "transfer";
 const IBC_CALLBACK: &'static str = "ibc_callback";
-const IBC_PACKET_LIFITIME: u64 = 604_800u64;
+const IBC_PACKET_LIFITIME: u64 = 3600u64; // 1 Hour
 
 pub fn swap(
     deps: DepsMut,
