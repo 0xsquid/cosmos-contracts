@@ -3,20 +3,12 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult,
 };
-// use cw2::set_contract_version;
+use ibc_tracking::msg::IBCLifecycleComplete;
+use ibc_tracking::{ibc, reply as ibc_tracking_reply};
 
 use crate::commands::{self};
 use crate::error::ContractError;
-use crate::ibc;
-use crate::msg::{
-    ExecuteMsg, IBCLifecycleComplete, InstantiateMsg, MigrateMsg, MsgReplyId, QueryMsg, SudoMsg,
-};
-
-/*
-// version info for migration info
-const CONTRACT_NAME: &str = "crates.io:testme";
-const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-*/
+use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, MsgReplyId, QueryMsg, SudoMsg};
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -59,7 +51,9 @@ pub fn execute(
 pub fn reply(deps: DepsMut, env: Env, reply: Reply) -> Result<Response, ContractError> {
     match MsgReplyId::from_repr(reply.id) {
         Some(MsgReplyId::Swap) => commands::handle_after_swap_action(deps, &env, reply),
-        Some(MsgReplyId::IbcTransfer) => commands::handle_ibc_transfer_reply(deps, reply),
+        Some(MsgReplyId::IbcTransfer) => {
+            ibc_tracking_reply::handle_ibc_transfer_reply(deps, reply).map_err(|e| e.into())
+        }
         Some(MsgReplyId::MultiSwap) => commands::handle_multiswap_reply(deps, &env),
         None => Err(ContractError::InvalidReplyId {}),
     }
@@ -73,9 +67,9 @@ pub fn sudo(deps: DepsMut, _env: Env, msg: SudoMsg) -> Result<Response, Contract
             sequence,
             success,
             ..
-        }) => ibc::receive_ack(deps, channel, sequence, success),
+        }) => ibc::receive_ack(deps, channel, sequence, success).map_err(|e| e.into()),
         SudoMsg::IBCLifecycleComplete(IBCLifecycleComplete::IBCTimeout { channel, sequence }) => {
-            ibc::receive_timeout(deps, channel, sequence)
+            ibc::receive_timeout(deps, channel, sequence).map_err(|e| e.into())
         }
     }
 }

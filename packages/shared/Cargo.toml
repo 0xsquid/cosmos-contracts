@@ -1,0 +1,11 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cosmwasm-schema =  { workspace = true }
+cosmwasm-std = { workspace = true }
+serde = { workspace = true }
+serde-cw-value = { workspace = true }
+schemars = { workspace = true }

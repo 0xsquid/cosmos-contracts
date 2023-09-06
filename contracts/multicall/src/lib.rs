@@ -1,3 +1,4 @@
+pub mod call;
 pub mod commands;
 pub mod contract;
 mod error;

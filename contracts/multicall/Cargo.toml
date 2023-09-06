@@ -1,5 +1,5 @@
 [package]
-name = "osmosis"
+name = "multicall"
 version = "0.1.0"
 authors = [""]
 edition = "2021"
@@ -30,11 +30,6 @@ itertools = { workspace = true }
 enum-repr = { workspace = true }
 prost = { workspace = true }
 
-osmosis-router = { version = "0.1.0", path = "../../packages/osmosis-router" }
+cw20 = "1.1.0"
 ibc-tracking = { version = "0.1.0", path = "../../packages/ibc-tracking" }
 shared = { version = "0.1.0", path = "../../packages/shared" }
-
-osmosis-std-derive = "0.13.2"
-
-[dev-dependencies]
-cw-multi-test = { workspace = true }
