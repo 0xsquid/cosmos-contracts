@@ -11,6 +11,18 @@ use crate::{
     ContractError,
 };
 
+/// ## Description
+/// Handles multicall initiation logic. Saves and validates provided calls and initiate call execution.
+/// Returns [`Response<SerializableJson>`] with specified attributes and messages if operation was successful,
+/// otherwise returns [`ContractError`]
+/// ## Params
+/// * **deps** is an object of type [`DepsMut<SerializableJson>`]
+///
+/// * **env** is an object of type [`Env`]
+///
+/// * **calls** is an array of type [`Call`]
+///
+/// * **fallback_address** is a field of type [`Option<String>`]
 pub fn handle_multicall(
     deps: DepsMut<SerializableJson>,
     env: &Env,
@@ -23,10 +35,9 @@ pub fn handle_multicall(
         });
     }
 
-    let state = MulticallState::new(calls.to_owned().as_mut(), fallback_address.clone());
-    state.validate()?;
-
+    let state = MulticallState::new(calls.to_owned().as_mut(), fallback_address.clone())?;
     store_multicall_state(deps.storage, &state)?;
+
     Ok(Response::new().add_message(WasmMsg::Execute {
         contract_addr: env.contract.address.to_string(),
         msg: to_binary(&ExecuteMsg::ProcessNextCall {})?,
@@ -34,6 +45,16 @@ pub fn handle_multicall(
     }))
 }
 
+/// ## Description
+/// Handles current call from the calls sequence. Converts specified msg into valid [`CosmosMsg`] type and send it to the node.
+/// Returns [`Response<SerializableJson>`] with specified attributes and messages if operation was successful,
+/// otherwise returns [`ContractError`]
+/// ## Params
+/// * **deps** is an object of type [`DepsMut<SerializableJson>`]
+///
+/// * **env** is an object of type [`Env`]
+///
+/// * **info** is an object of type [`MessageInfo`]
 pub fn handle_call(
     deps: DepsMut<SerializableJson>,
     env: &Env,
@@ -59,6 +80,12 @@ pub fn handle_call(
     Ok(Response::new().add_submessage(submsg))
 }
 
+/// ## Description
+/// Handles `handle_call` message reply, recursively proceeds execution to the next call.
+/// Returns [`Response`] with specified attributes and messages if operation was successful,
+/// otherwise returns [`ContractError`]
+/// ## Params
+/// * **env** is an object of type [`Env`]
 pub fn handle_call_reply(env: &Env) -> Result<Response, ContractError> {
     // proceed to the next call here
     Ok(Response::new().add_message(WasmMsg::Execute {
@@ -68,6 +95,16 @@ pub fn handle_call_reply(env: &Env) -> Result<Response, ContractError> {
     }))
 }
 
+/// ## Description
+/// Handles ibc tracking callback logic, recursively proceeds execution to the next call.
+/// Returns [`Response`] with specified attributes and messages if operation was successful,
+/// otherwise returns [`ContractError`]
+/// ## Params
+/// * **deps** is an object of type [`DepsMut`]
+///
+/// * **env** is an object of type [`Env`]
+///
+/// * **reply** is an object of type [`Reply`]
 pub fn handle_ibc_tracking_reply(
     deps: DepsMut,
     env: &Env,

@@ -2,6 +2,8 @@ use cosmwasm_std::StdError;
 use ibc_tracking::IbcTrackingError;
 use thiserror::Error;
 
+/// ## Description
+/// This enum describes multicall contract errors
 #[derive(Error, Debug)]
 pub enum ContractError {
     #[error("{0}")]
@@ -15,6 +17,12 @@ pub enum ContractError {
 
     #[error("Failed to serialize call into proto msg")]
     ProtoSerializationError {},
+
+    #[error("Replacer field must be non-empty string and must start from '/' symbol")]
+    InvalidReplacer {},
+
+    #[error("Either amount of pointer to the field must be set for enabling ibc tracking")]
+    EitherAmountOfPointerMustBeSet {},
 
     #[error("Invalid reply id")]
     InvalidReplyId {},
@@ -42,4 +50,7 @@ pub enum ContractError {
 
     #[error("Replacer field not found. Replacer: {replacer}")]
     ReplacerFieldNotFound { replacer: String },
+
+    #[error("Invalid amount field pointer. Must be a String field")]
+    InvalidAmountPointer {},
 }

@@ -3,6 +3,9 @@ use schemars::JsonSchema;
 
 pub mod util;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(
     ::cosmwasm_schema::serde::Serialize,
     ::cosmwasm_schema::serde::Deserialize,

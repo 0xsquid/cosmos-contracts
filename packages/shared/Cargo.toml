@@ -9,3 +9,6 @@ cosmwasm-std = { workspace = true }
 serde = { workspace = true }
 serde-cw-value = { workspace = true }
 schemars = { workspace = true }
+
+[dev-dependencies]
+serde-json-wasm = { workspace = true }
