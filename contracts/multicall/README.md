@@ -88,7 +88,7 @@ Note: either 'amount' or 'pointer' field must be set, otherwise validation error
         "channel": "channel-0",
         "denom": "usquid",
         "amount": "1" || null,
-        "amount_pointer" "/path/to/amount/field" || null
+        "amount_pointer": "/path/to/amount/field" || null
     }
 }
 ```
