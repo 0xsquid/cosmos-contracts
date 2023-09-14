@@ -1,7 +1,7 @@
 [package]
 name = "osmosis"
-version = "0.1.0"
-authors = [""]
+version = "1.2.0"
+authors = ["0xsquid"]
 edition = "2021"
 
 exclude = [ "contract.wasm", "hash.txt" ]
@@ -30,9 +30,9 @@ itertools = { workspace = true }
 enum-repr = { workspace = true }
 prost = { workspace = true }
 
-osmosis-router = { version = "0.1.0", path = "../../packages/osmosis-router" }
-ibc-tracking = { version = "0.1.0", path = "../../packages/ibc-tracking" }
-shared = { version = "0.1.0", path = "../../packages/shared" }
+osmosis-router = { version = "1.2.0", path = "../../packages/osmosis-router" }
+ibc-tracking = { version = "1.2.0", path = "../../packages/ibc-tracking" }
+shared = { version = "1.2.0", path = "../../packages/shared" }
 
 osmosis-std-derive = "0.13.2"
 
