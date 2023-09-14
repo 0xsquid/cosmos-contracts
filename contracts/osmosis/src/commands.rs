@@ -1,30 +1,28 @@
-use ::prost::Message;
-
 use cosmwasm_std::{
-    to_binary, BankMsg, DepsMut, Env, MessageInfo, Reply, Response, SubMsg, SubMsgResponse,
-    SubMsgResult, WasmMsg,
+    to_binary, BankMsg, DepsMut, Env, MessageInfo, Reply, Response, SubMsg, WasmMsg,
 };
 use cw_utils::one_coin;
+use ibc_tracking::{
+    msg::MsgTransfer,
+    state::{store_ibc_transfer_reply_state, IbcTransferReplyState},
+    util::insert_callback_key,
+};
 use osmosis_router::{
     router::{build_swap_msg, get_swap_amount_out_response},
     OsmosisSwapMsg,
 };
 
 use crate::{
-    msg::{
-        AfterSwapAction, ExecuteMsg, MsgReplyId, MsgTransfer, MsgTransferResponse, MultiSwapMsg,
-    },
+    msg::{AfterSwapAction, ExecuteMsg, MsgReplyId, MultiSwapMsg},
     state::{
-        load_ibc_transfer_reply_state, load_multi_swap_state, load_swap_reply_state,
-        remove_multi_swap_state, store_awaiting_ibc_transfer, store_ibc_transfer_reply_state,
-        store_multi_swap_state, store_swap_reply_state, swap_reply_state_exists,
-        IbcTransferReplyState, MultiSwapState, SwapReplyState,
+        load_multi_swap_state, load_swap_reply_state, remove_multi_swap_state,
+        store_multi_swap_state, store_swap_reply_state, swap_reply_state_exists, MultiSwapState,
+        SwapReplyState,
     },
     ContractError,
 };
 
-const TRANSFER_PORT: &'static str = "transfer";
-const IBC_CALLBACK: &'static str = "ibc_callback";
+const TRANSFER_PORT: &str = "transfer";
 const IBC_PACKET_LIFITIME: u64 = 3600u64; // 1 Hour
 
 pub fn swap(
@@ -89,14 +87,7 @@ pub fn handle_after_swap_action(
             next_memo,
         } => {
             let next_memo = next_memo.unwrap_or_else(|| serde_json_wasm::from_str("{}").unwrap());
-            let next_memo = {
-                let serde_cw_value::Value::Map(mut m) = next_memo.0 else { unreachable!() };
-                m.insert(
-                    serde_cw_value::Value::String(IBC_CALLBACK.to_owned()),
-                    serde_cw_value::Value::String(env.contract.address.to_string()),
-                );
-                serde_cw_value::Value::Map(m)
-            };
+            let next_memo = insert_callback_key(next_memo.0, env);
 
             let memo = serde_json_wasm::to_string(&next_memo)
                 .map_err(|_e| ContractError::InvalidMemo {})?;
@@ -130,26 +121,6 @@ pub fn handle_after_swap_action(
     };
 
     Ok(response)
-}
-
-pub fn handle_ibc_transfer_reply(deps: DepsMut, reply: Reply) -> Result<Response, ContractError> {
-    let SubMsgResult::Ok(SubMsgResponse { data: Some(b), .. }) = reply.result else {
-        return Err(ContractError::FailedIBCTransfer { msg: format!("failed reply: {:?}", reply.result) })
-    };
-
-    let ibc_transfer_response =
-        MsgTransferResponse::decode(&b[..]).map_err(|_e| ContractError::FailedIBCTransfer {
-            msg: format!("could not decode response: {b}"),
-        })?;
-
-    let ibc_transfer_info = load_ibc_transfer_reply_state(deps.storage)?;
-    store_awaiting_ibc_transfer(
-        deps.storage,
-        ibc_transfer_response.sequence,
-        &ibc_transfer_info,
-    )?;
-
-    Ok(Response::new())
 }
 
 pub fn handle_multiswap(

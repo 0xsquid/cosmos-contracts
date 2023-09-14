@@ -41,7 +41,7 @@ impl OsmosisPath {
         slippage: Decimal,
         now: &Timestamp,
     ) -> Result<cosmwasm_std::Coin, OsmosisRouterError> {
-        let (start_time, end_time) = self.get_twap_window(&now);
+        let (start_time, end_time) = self.get_twap_window(now);
 
         let mut price = Decimal::one();
         let mut next_input_denom = input_coin.denom.as_str();

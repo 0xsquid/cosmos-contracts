@@ -1,4 +1,5 @@
 use cosmwasm_std::StdError;
+use ibc_tracking::IbcTrackingError;
 use osmosis_router::error::OsmosisRouterError;
 use thiserror::Error;
 
@@ -11,6 +12,9 @@ pub enum ContractError {
     OsmosisRouterError(#[from] OsmosisRouterError),
 
     #[error("{0}")]
+    IbcTrackingError(#[from] IbcTrackingError),
+
+    #[error("{0}")]
     PaymentError(#[from] cw_utils::PaymentError),
 
     #[error("Unauthorized")]
@@ -21,9 +25,6 @@ pub enum ContractError {
 
     #[error("Invalid reply id")]
     InvalidReplyId {},
-
-    #[error("Ibc transfer failed: {msg:?}")]
-    FailedIBCTransfer { msg: String },
 
     #[error("Invalid amount of multi-swap calls. Must be non-zero")]
     InvalidAmountOfSwaps {},

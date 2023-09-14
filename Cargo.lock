@@ -276,6 +276,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw20"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "011c45920f8200bd5d32d4fe52502506f64f2f75651ab408054d4cfc75ca3a9b"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-utils",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "der"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -459,6 +472,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "ibc-tracking"
+version = "1.2.0"
+dependencies = [
+ "bech32",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "osmosis-std",
+ "osmosis-std-derive",
+ "prost 0.11.9",
+ "schemars",
+ "serde",
+ "serde-cw-value",
+ "serde-json-wasm",
+ "thiserror",
+]
+
+[[package]]
 name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -493,21 +524,25 @@ checksum = "2b00cc1c228a6782d0f076e7b232802e0c5689d41bb5df366f2a6b6621cfdfe1"
 
 [[package]]
 name = "multicall"
-version = "0.1.0"
+version = "1.2.0"
 dependencies = [
  "bech32",
  "cosmwasm-schema",
  "cosmwasm-std",
- "hex",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw2",
+ "cw20",
+ "enum-repr",
+ "ibc-tracking",
  "itertools",
  "osmosis-std",
- "osmosis-std-derive",
  "prost 0.11.9",
  "schemars",
  "serde",
  "serde-cw-value",
  "serde-json-wasm",
- "sha2 0.10.6",
+ "shared",
  "thiserror",
 ]
 
@@ -544,7 +579,7 @@ checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
 name = "osmosis"
-version = "0.1.0"
+version = "1.2.0"
 dependencies = [
  "bech32",
  "cosmwasm-schema",
@@ -554,6 +589,7 @@ dependencies = [
  "cw-utils",
  "cw2",
  "enum-repr",
+ "ibc-tracking",
  "itertools",
  "osmosis-router",
  "osmosis-std",
@@ -563,12 +599,13 @@ dependencies = [
  "serde",
  "serde-cw-value",
  "serde-json-wasm",
+ "shared",
  "thiserror",
 ]
 
 [[package]]
 name = "osmosis-router"
-version = "0.1.0"
+version = "1.2.0"
 dependencies = [
  "bech32",
  "cosmwasm-schema",
@@ -856,6 +893,18 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest 0.10.6",
+]
+
+[[package]]
+name = "shared"
+version = "1.2.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "schemars",
+ "serde",
+ "serde-cw-value",
+ "serde-json-wasm",
 ]
 
 [[package]]
