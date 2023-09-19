@@ -32,7 +32,7 @@ pub fn execute(
             swap_msg,
             after_swap_action,
             local_fallback_address,
-        } => commands::swap(
+        } => commands::handle_swap_with_action(
             deps,
             &env,
             &info,
@@ -44,6 +44,12 @@ pub fn execute(
             swaps,
             local_fallback_address,
         } => commands::handle_multiswap(deps, &env, swaps, local_fallback_address),
+        ExecuteMsg::ProcessSwap { swap_msg } => {
+            commands::handle_process_swap(deps, &env, &info, swap_msg)
+        }
+        ExecuteMsg::ProcessMultiSwap {} => {
+            commands::handle_multiswap_reply(deps, &env, Some(&info))
+        }
     }
 }
 
@@ -54,7 +60,13 @@ pub fn reply(deps: DepsMut, env: Env, reply: Reply) -> Result<Response, Contract
         Some(MsgReplyId::IbcTransfer) => {
             ibc_tracking_reply::handle_ibc_transfer_reply(deps, reply).map_err(|e| e.into())
         }
-        Some(MsgReplyId::MultiSwap) => commands::handle_multiswap_reply(deps, &env),
+        Some(MsgReplyId::MultiSwap) => commands::handle_multiswap_reply(deps, &env, None),
+        Some(MsgReplyId::SwapWithActionFallback) => {
+            commands::handle_swap_with_action_fallback_reply(deps, &env, reply)
+        }
+        Some(MsgReplyId::MultiSwapFallback) => {
+            commands::handle_multiswap_fallback_reply(deps, &env, reply)
+        }
         None => Err(ContractError::InvalidReplyId {}),
     }
 }

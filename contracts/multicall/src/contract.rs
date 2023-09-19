@@ -81,12 +81,17 @@ pub fn execute(
 /// * **MsgReplyId::ProcessCall** Callback from the current call leading to the next call
 ///
 /// * **MsgReplyId::IbcTransferTracking** Callback for enabling ibc tracking
+///
+/// * **MsgReplyId::ExecutionFallback** Callback for catching execution error and attempting to recover funds locally
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, env: Env, reply: Reply) -> Result<Response, ContractError> {
     match MsgReplyId::from_repr(reply.id) {
         Some(MsgReplyId::ProcessCall) => commands::handle_call_reply(&env),
         Some(MsgReplyId::IbcTransferTracking) => {
             commands::handle_ibc_tracking_reply(deps, &env, reply)
+        }
+        Some(MsgReplyId::ExecutionFallback) => {
+            commands::handle_execution_fallback_reply(deps, &env, reply)
         }
         None => Err(ContractError::InvalidReplyId {}),
     }

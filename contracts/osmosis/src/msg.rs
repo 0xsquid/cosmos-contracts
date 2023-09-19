@@ -21,6 +21,10 @@ pub enum ExecuteMsg {
         swaps: Vec<MultiSwapMsg>,
         local_fallback_address: String,
     },
+    ProcessSwap {
+        swap_msg: OsmosisSwapMsg,
+    },
+    ProcessMultiSwap {},
 }
 
 #[cw_serde]
@@ -71,4 +75,6 @@ pub enum MsgReplyId {
     Swap = 1,
     IbcTransfer = 2,
     MultiSwap = 3,
+    SwapWithActionFallback = 4,
+    MultiSwapFallback = 5,
 }

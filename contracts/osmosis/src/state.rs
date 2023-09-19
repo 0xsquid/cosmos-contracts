@@ -28,10 +28,11 @@ pub fn store_swap_reply_state(storage: &mut dyn Storage, data: &SwapReplyState) 
 }
 
 pub fn load_swap_reply_state(storage: &mut dyn Storage) -> StdResult<SwapReplyState> {
-    let data = SWAP_REPLY_STATE.load(storage)?;
-    SWAP_REPLY_STATE.remove(storage);
+    SWAP_REPLY_STATE.load(storage)
+}
 
-    Ok(data)
+pub fn remove_swap_reply_state(storage: &mut dyn Storage) {
+    SWAP_REPLY_STATE.remove(storage)
 }
 
 pub fn store_multi_swap_state(storage: &mut dyn Storage, data: &MultiSwapState) -> StdResult<()> {
