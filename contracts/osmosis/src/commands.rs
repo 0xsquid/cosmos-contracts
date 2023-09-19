@@ -226,7 +226,7 @@ pub fn handle_swap_with_action_fallback_reply(
 
     // in case of no error finish execution
     if reply.result.is_ok() {
-        return Ok(Response::new());
+        return Ok(Response::new().add_attribute("execution", "success"));
     }
 
     // otherwise transfer all owned funds to the fallback address
@@ -243,7 +243,7 @@ pub fn handle_multiswap_fallback_reply(
 
     // in case of no error finish execution
     if reply.result.is_ok() {
-        return Ok(Response::new());
+        return Ok(Response::new().add_attribute("execution", "success"));
     }
 
     // otherwise transfer all owned funds to the fallback address
@@ -263,8 +263,10 @@ fn recover_funds(
         return Err(StdError::generic_err("Nothing to recover, forwarding error").into());
     }
 
-    Ok(Response::new().add_message(BankMsg::Send {
-        to_address: fallback_address.to_owned(),
-        amount: owned_coins,
-    }))
+    Ok(Response::new()
+        .add_message(BankMsg::Send {
+            to_address: fallback_address.to_owned(),
+            amount: owned_coins,
+        })
+        .add_attribute("execution", "recovered"))
 }

@@ -155,7 +155,10 @@ Replacer is basically a path from the root of the `msg` object to a field. For e
 `replacer` value is equals to a path to `amount` field inside bank message. This field will be replaced with fetched contract balance of `uosmo` coin. Numbers in the path are equal to an index in the array.
 
 ## Fallback address
-Fallback address is an optional field that must be set only when `ibc_tracking` call action is selected, otherwise it can be null.
+Fallback address is an optional field that could be set for:
+- ibc error recovery when `ibc_tracking` action is enabled
+- local funds recovery in case of contract execution failure, e.g. multicall contract was trying to perform a swap and failed because of price change - so instead of forwarding dex error multicall contract will recover all owned funds to the specified fallback address. Note: if fallback address is not set or there is no funds to recover - the contract will forward an error.
+
 
 ## Example calls
 
@@ -198,7 +201,7 @@ Fallback address is an optional field that must be set only when `ibc_tracking` 
             }
           },
           {
-            "msg_to_proto_binary": {
+            "field_to_proto_binary": {
                 "replacer": "/stargate/value",
                 "proto_msg_type": "ibc_transfer"
             }

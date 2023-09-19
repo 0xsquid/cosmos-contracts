@@ -55,6 +55,8 @@ pub enum MsgReplyId {
     ProcessCall = 1,
     /// Callback for enabling ibc tracking
     IbcTransferTracking = 2,
+    // Callback for catching execution error and attempting to recover funds locally
+    ExecutionFallback = 3,
 }
 
 /// ## Call

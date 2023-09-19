@@ -53,4 +53,10 @@ pub enum ContractError {
 
     #[error("Invalid amount field pointer. Must be a String field")]
     InvalidAmountPointer {},
+
+    #[error("Error reply expected but got success response")]
+    ErrorReplyExpected {},
+
+    #[error("{msg}. Error: {origin_err}")]
+    RecoveryError { msg: String, origin_err: String },
 }
