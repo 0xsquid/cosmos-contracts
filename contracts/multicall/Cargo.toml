@@ -1,6 +1,6 @@
 [package]
 name = "multicall"
-version = "1.2.1"
+version = "1.2.2"
 authors = ["0xsquid"]
 edition = "2021"
 
@@ -31,5 +31,6 @@ enum-repr = { workspace = true }
 prost = { workspace = true }
 
 cw20 = "1.1.0"
+
 ibc-tracking = { version = "1.2.0", path = "../../packages/ibc-tracking" }
 shared = { version = "1.2.0", path = "../../packages/shared" }

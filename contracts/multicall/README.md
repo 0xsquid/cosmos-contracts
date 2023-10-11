@@ -106,13 +106,13 @@ Converts specified field into [`Binary`] type
 
 ### `field_to_proto_binary`
 Converts specified field into [`Binary`] type encoded using [`prost::Message::encode`] method.
-Note: since the type of the message should be known to the contract at the moment only ibc transfer is supported.
+Note: since the type of the message should be known to the contract at the moment only ibc transfer and osmosis swap exact amount in is supported.
 
 ```json
 {
     "field_to_proto_binary": {
         "replacer": "/path/to/field/for/replacement",
-        "proto_msg_type": "ibc_transfer"
+        "proto_msg_type": "ibc_transfer" | "osmosis_swap_exact_amt_in"
     }
 }
 ```

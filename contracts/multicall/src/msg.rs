@@ -145,4 +145,6 @@ pub struct ReplaceInfo {
 pub enum ProtoMessageType {
     /// ibc message type
     IbcTransfer,
+    /// osmosis gamm swap exact amount in type
+    OsmosisSwapExactAmtIn,
 }

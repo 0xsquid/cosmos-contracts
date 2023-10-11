@@ -7,6 +7,7 @@ use ibc_tracking::{
     msg::{CwIbcMessage, MsgTransfer},
     state::{store_ibc_transfer_reply_state, IbcTransferReplyState},
 };
+use osmosis_std::types::osmosis::gamm::v1beta1::MsgSwapExactAmountIn;
 use shared::{util::json_pointer, SerializableJson};
 use std::str::FromStr;
 
@@ -153,11 +154,15 @@ impl Call {
                                 .map_err(|_| ContractError::ProtoSerializationError {})?
                                 .into();
 
-                            let mut bytes = Vec::new();
-                            prost::Message::encode(&ibc, &mut bytes)
+                            self.encode_proto_msg(&ibc)?
+                        }
+                        ProtoMessageType::OsmosisSwapExactAmtIn => {
+                            let swap: MsgSwapExactAmountIn = binary_field
+                                .clone()
+                                .deserialize_into::<MsgSwapExactAmountIn>()
                                 .map_err(|_| ContractError::ProtoSerializationError {})?;
 
-                            Binary(bytes)
+                            self.encode_proto_msg(&swap)?
                         }
                     };
 
@@ -187,5 +192,13 @@ impl Call {
 
         *field = serde_cw_value::Value::String(value.to_owned());
         Ok(())
+    }
+
+    fn encode_proto_msg<T: prost::Message>(&self, msg: &T) -> Result<Binary, ContractError> {
+        let mut bytes = Vec::new();
+        prost::Message::encode(msg, &mut bytes)
+            .map_err(|_| ContractError::ProtoSerializationError {})?;
+
+        Ok(Binary(bytes))
     }
 }
