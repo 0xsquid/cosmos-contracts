@@ -19,7 +19,7 @@ pub enum ExecuteMsg {
         /// onchain calls to perform
         calls: Vec<Call>,
         /// fallback address for failed/timeout rejected ibc transfers
-        fallback_address: Option<String>,
+        fallback_address: String,
     },
     /// ## Description
     /// Internal action, can be called only by the contract itself

@@ -29,7 +29,7 @@ pub fn handle_multicall(
     deps: DepsMut<SerializableJson>,
     env: &Env,
     calls: &[Call],
-    fallback_address: &Option<String>,
+    fallback_address: &str,
 ) -> Result<Response<SerializableJson>, ContractError> {
     if multicall_state_exists(deps.storage)? {
         return Err(ContractError::ContractLocked {
@@ -37,7 +37,7 @@ pub fn handle_multicall(
         });
     }
 
-    let state = MulticallState::new(calls.to_owned().as_mut(), fallback_address.clone())?;
+    let state = MulticallState::new(calls.to_owned().as_mut(), fallback_address.to_owned())?;
     store_multicall_state(deps.storage, &state)?;
 
     Ok(Response::new().add_submessage(SubMsg::reply_on_error(
@@ -76,7 +76,19 @@ pub fn handle_call(
     let Some(call) = state.next_call() else {
         // if there is no calls left then finish the execution here
         remove_multicall_state(deps.storage)?;
-        return Ok(Response::new().add_attribute("multicall_execution", "success"));
+
+        let mut response: Response<SerializableJson> = Response::new().add_attribute("multicall_execution", "success");
+
+        // query contracts balance for any leftover funds after calls execution and if anything left then transfer it to the fallback address
+        let leftover_funds = deps.querier.query_all_balances(env.contract.address.as_str())?;
+        if !leftover_funds.is_empty() {
+            response = response.add_message(BankMsg::Send {
+                to_address: fallback_address,
+                amount: leftover_funds,
+            }).add_attribute("leftover_funds", "recovered");
+        }
+
+        return Ok(response);
     };
 
     let submsg = call.try_into_msg(deps.storage, &deps.querier, env, &fallback_address)?;
@@ -145,9 +157,7 @@ pub fn handle_execution_fallback_reply(
     let state = load_multicall_state(deps.storage)?;
     remove_multicall_state(deps.storage)?;
 
-    let Some(fallback_address) = state.fallback_address else {
-        return Err(ContractError::RecoveryError { msg: "Fallback address is not set for local funds recovery".to_owned(), origin_err });
-    };
+    let fallback_address = state.fallback_address;
 
     let recover_funds = deps
         .querier

@@ -13,27 +13,10 @@ use self::mock_querier::mock_dependencies;
 
 #[test]
 fn test_multicall_state() {
-    let state = MulticallState::new(&mut [], None);
+    let state = MulticallState::new(&mut [], "addr0000".to_owned());
     match state {
         Err(ContractError::EmptyCallsList {}) => (),
         _ => panic!("expecting ContractError::EmptyCallsList"),
-    };
-
-    let state = MulticallState::new(
-        &mut [Call {
-            msg: Value::String("msg".to_owned()).into(),
-            actions: vec![CallAction::IbcTracking {
-                channel: "channel-0".to_owned(),
-                denom: "usquid".to_owned(),
-                amount: Some(Uint128::from(1u128)),
-                amount_pointer: None,
-            }],
-        }],
-        None,
-    );
-    match state {
-        Err(ContractError::FallbackAddressMustBeSetForIbcTracking {}) => (),
-        _ => panic!("expecting ContractError::FallbackAddressMustBeSetForIbcTracking"),
     };
 
     let state = MulticallState::new(
@@ -46,7 +29,7 @@ fn test_multicall_state() {
                 amount_pointer: None,
             }],
         }],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     match state {
         Err(ContractError::EitherAmountOfPointerMustBeSet {}) => (),
@@ -71,7 +54,7 @@ fn test_multicall_state() {
                 },
             ],
         }],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     match state {
         Err(ContractError::InvalidCallActionArgument { msg }) => {
@@ -80,7 +63,7 @@ fn test_multicall_state() {
                 "Only one or none IbcTracking call action entries allowed per call".to_owned()
             )
         }
-        _ => panic!("expecting ContractError::FallbackAddressMustBeSetForIbcTracking"),
+        _ => panic!("expecting ContractError::InvalidCallActionArgument"),
     };
 
     let state = MulticallState::new(
@@ -91,7 +74,7 @@ fn test_multicall_state() {
                 replacer: "".to_owned(),
             }],
         }],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     match state {
         Err(ContractError::InvalidReplacer {}) => (),
@@ -106,7 +89,7 @@ fn test_multicall_state() {
                 replacer: "funds/0/amount".to_owned(),
             }],
         }],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     match state {
         Err(ContractError::InvalidReplacer {}) => (),
@@ -123,7 +106,7 @@ fn test_multicall_state() {
                 amount_pointer: Some("invalid/replacer".to_owned()),
             }],
         }],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     match state {
         Err(ContractError::InvalidReplacer {}) => (),
@@ -147,7 +130,7 @@ fn test_multicall_state() {
                 ],
             }],
         }],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     match state {
         Err(ContractError::InvalidReplacer {}) => (),
@@ -171,7 +154,7 @@ fn test_multicall_state() {
                 ],
             }],
         }],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     match state {
         Err(ContractError::InvalidReplacer {}) => (),
@@ -239,7 +222,7 @@ fn test_multicall_state() {
                 actions: vec![],
             },
         ],
-        Some("addr0000".to_owned()),
+        "addr0000".to_owned(),
     );
     assert_eq!(valid_state.is_ok(), true);
 
@@ -355,7 +338,7 @@ fn test_call_into_msg() {
     };
 
     let bank_send_msg = bank_send_call
-        .try_into_msg(deps.storage, &deps.querier, &env, &None)
+        .try_into_msg(deps.storage, &deps.querier, &env, "addr0000")
         .unwrap();
 
     assert_eq!(bank_send_msg.id, MsgReplyId::ProcessCall.repr());
@@ -415,7 +398,7 @@ fn test_call_into_msg() {
     };
 
     let wasm_msg = wasm_call
-        .try_into_msg(deps.storage, &deps.querier, &env, &None)
+        .try_into_msg(deps.storage, &deps.querier, &env, "addr0000")
         .unwrap();
 
     assert_eq!(wasm_msg.id, MsgReplyId::ProcessCall.repr());
@@ -482,7 +465,7 @@ fn test_call_into_msg() {
     };
 
     let custom_query_msg = custom_query_call
-        .try_into_msg(deps.storage, &deps.querier, &env, &None)
+        .try_into_msg(deps.storage, &deps.querier, &env, "addr0000")
         .unwrap();
 
     assert_eq!(custom_query_msg.id, MsgReplyId::ProcessCall.repr());
@@ -535,12 +518,7 @@ fn test_call_into_msg() {
     };
 
     let ibc_msg = ibc_call
-        .try_into_msg(
-            deps.storage,
-            &deps.querier,
-            &env,
-            &Some("addr0004".to_owned()),
-        )
+        .try_into_msg(deps.storage, &deps.querier, &env, "addr0004")
         .unwrap();
 
     assert_eq!(ibc_msg.id, MsgReplyId::IbcTransferTracking.repr());
@@ -600,12 +578,7 @@ fn test_call_into_msg() {
     };
 
     let ibc_msg = ibc_call
-        .try_into_msg(
-            deps.storage,
-            &deps.querier,
-            &env,
-            &Some("addr0004".to_owned()),
-        )
+        .try_into_msg(deps.storage, &deps.querier, &env, "addr0004")
         .unwrap();
 
     assert_eq!(ibc_msg.id, MsgReplyId::IbcTransferTracking.repr());
@@ -653,7 +626,7 @@ fn test_call_into_msg() {
     };
 
     let invalid_replacer_msg_err = invalid_replacer_call
-        .try_into_msg(deps.storage, &deps.querier, &env, &None)
+        .try_into_msg(deps.storage, &deps.querier, &env, "addr0004")
         .unwrap_err();
 
     match invalid_replacer_msg_err {
@@ -689,7 +662,7 @@ fn test_call_into_msg() {
     };
 
     let zero_balance_msg_err = zero_balance_call
-        .try_into_msg(deps.storage, &deps.querier, &env, &None)
+        .try_into_msg(deps.storage, &deps.querier, &env, "addr0004")
         .unwrap_err();
 
     match zero_balance_msg_err {
@@ -699,52 +672,6 @@ fn test_call_into_msg() {
 
         _ => panic!("unexpected error"),
     }
-
-    let no_fallback_ibc_call = Call {
-        msg: serde_json_wasm::from_str(
-            r#"
-        {
-            "stargate": {
-                "type_url": "/ibc.applications.transfer.v1.MsgTransfer",
-                "value": {
-                    "source_port": "transfer",
-                    "source_channel": "channel-3",
-                    "token": {
-                        "denom": "usquid",
-                        "amount": "111111"
-                    },
-                    "sender": "osmo1vmpds4p8grwz54dygeljhq9vffssw5caydyj3heqd02f2seckk3smlug7w",
-                    "receiver": "axelar15t9awn6jnxheckur5vc6dqv6pqlpph0hw24vwf",
-                    "timeout_timestamp": 1693856646000000000,
-                    "memo": "{\"ibc_callback\":\"addr0000\"}"
-                }
-            }
-        }
-        "#,
-        )
-        .unwrap(),
-        actions: vec![
-            CallAction::IbcTracking {
-                channel: "channel-3".to_owned(),
-                denom: "usquid".to_owned(),
-                amount: Some(Uint128::from(111111u128)),
-                amount_pointer: None,
-            },
-            CallAction::FieldToProtoBinary {
-                replacer: "/stargate/value".to_owned(),
-                proto_msg_type: ProtoMessageType::IbcTransfer,
-            },
-        ],
-    };
-
-    let no_fallback_ibc_msg_err = no_fallback_ibc_call
-        .try_into_msg(deps.storage, &deps.querier, &env, &None)
-        .unwrap_err();
-
-    match no_fallback_ibc_msg_err {
-        ContractError::FallbackAddressMustBeSetForIbcTracking {} => (),
-        _ => panic!("unexpected error"),
-    };
 }
 
 #[cfg(test)]

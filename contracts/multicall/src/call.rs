@@ -24,7 +24,7 @@ impl Call {
         storage: &mut dyn Storage,
         querier: &QuerierWrapper<SerializableJson>,
         env: &Env,
-        fallback_address: &Option<String>,
+        fallback_address: &str,
     ) -> Result<SubMsg<SerializableJson>, ContractError> {
         let mut cosmos_msg = self.msg.0.clone();
         let mut reply_id = MsgReplyId::ProcessCall.repr();
@@ -96,9 +96,7 @@ impl Call {
                 } => {
                     reply_id = MsgReplyId::IbcTransferTracking.repr();
 
-                    let Some(local_fallback_address) = fallback_address.clone() else {
-                        return Err(ContractError::FallbackAddressMustBeSetForIbcTracking {});
-                    };
+                    let local_fallback_address = fallback_address.to_owned();
 
                     let amount = if let Some(pointer) = amount_pointer {
                         let amount_field = json_pointer(&mut cosmos_msg, pointer).ok_or(
