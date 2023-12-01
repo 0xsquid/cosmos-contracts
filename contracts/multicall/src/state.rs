@@ -22,16 +22,13 @@ pub struct MulticallState {
     /// onchain calls to perform
     pub calls: Vec<Call>,
     /// fallback address for failed/timeout rejected ibc transfers
-    pub fallback_address: Option<String>,
+    pub fallback_address: String,
 }
 
 impl MulticallState {
     /// ## Description
     /// Creates new instance of [`MulticallState`] struct
-    pub fn new(
-        calls: &mut [Call],
-        fallback_address: Option<String>,
-    ) -> Result<Self, ContractError> {
+    pub fn new(calls: &mut [Call], fallback_address: String) -> Result<Self, ContractError> {
         calls.iter_mut().for_each(|call| call.actions.sort());
 
         let state = Self {
@@ -58,17 +55,6 @@ impl MulticallState {
     fn validate(&self) -> Result<(), ContractError> {
         if self.calls.is_empty() {
             return Err(ContractError::EmptyCallsList {});
-        }
-
-        // if ibc tracking is required then fallback address must be set
-        let has_ibc_tracking = self
-            .calls
-            .iter()
-            .flat_map(|call| call.actions.clone())
-            .any(|action| matches!(action, CallAction::IbcTracking { .. }));
-
-        if has_ibc_tracking && self.fallback_address.is_none() {
-            return Err(ContractError::FallbackAddressMustBeSetForIbcTracking {});
         }
 
         for call in self.calls.iter() {

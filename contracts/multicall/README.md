@@ -17,7 +17,8 @@ Executes a set of cosmos messages specified in the calls array
         "msg": {},
         "actions": []
       }
-    ]
+    ],
+    "fallback_address": "<local_fallback_address>",
   }
 }
 ```
@@ -106,13 +107,13 @@ Converts specified field into [`Binary`] type
 
 ### `field_to_proto_binary`
 Converts specified field into [`Binary`] type encoded using [`prost::Message::encode`] method.
-Note: since the type of the message should be known to the contract at the moment only ibc transfer is supported.
+Note: since the type of the message should be known to the contract at the moment only ibc transfer and osmosis swap exact amount in is supported.
 
 ```json
 {
     "field_to_proto_binary": {
         "replacer": "/path/to/field/for/replacement",
-        "proto_msg_type": "ibc_transfer"
+        "proto_msg_type": "ibc_transfer" | "osmosis_swap_exact_amt_in"
     }
 }
 ```
@@ -155,9 +156,9 @@ Replacer is basically a path from the root of the `msg` object to a field. For e
 `replacer` value is equals to a path to `amount` field inside bank message. This field will be replaced with fetched contract balance of `uosmo` coin. Numbers in the path are equal to an index in the array.
 
 ## Fallback address
-Fallback address is an optional field that could be set for:
+Fallback address is a field that must be set for:
 - ibc error recovery when `ibc_tracking` action is enabled
-- local funds recovery in case of contract execution failure, e.g. multicall contract was trying to perform a swap and failed because of price change - so instead of forwarding dex error multicall contract will recover all owned funds to the specified fallback address. Note: if fallback address is not set or there is no funds to recover - the contract will forward an error.
+- local funds recovery in case of contract execution failure or any funds left on the contract balance after successful execution, e.g. multicall contract was trying to perform a swap and failed because of price change - so instead of forwarding dex error multicall contract will recover all owned funds to the specified fallback address. Note: if fallback address is not set or there is no funds to recover - the contract will forward an error.
 
 
 ## Example calls

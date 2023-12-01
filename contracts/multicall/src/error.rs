@@ -36,9 +36,6 @@ pub enum ContractError {
     #[error("Calls list is empty")]
     EmptyCallsList {},
 
-    #[error("Fallback address must be set for Ibc tracking")]
-    FallbackAddressMustBeSetForIbcTracking {},
-
     #[error("Invalid call action argument: {msg}")]
     InvalidCallActionArgument { msg: String },
 

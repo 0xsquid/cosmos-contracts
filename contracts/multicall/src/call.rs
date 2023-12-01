@@ -7,6 +7,7 @@ use ibc_tracking::{
     msg::{CwIbcMessage, MsgTransfer},
     state::{store_ibc_transfer_reply_state, IbcTransferReplyState},
 };
+use osmosis_std::types::osmosis::gamm::v1beta1::MsgSwapExactAmountIn;
 use shared::{util::json_pointer, SerializableJson};
 use std::str::FromStr;
 
@@ -23,7 +24,7 @@ impl Call {
         storage: &mut dyn Storage,
         querier: &QuerierWrapper<SerializableJson>,
         env: &Env,
-        fallback_address: &Option<String>,
+        fallback_address: &str,
     ) -> Result<SubMsg<SerializableJson>, ContractError> {
         let mut cosmos_msg = self.msg.0.clone();
         let mut reply_id = MsgReplyId::ProcessCall.repr();
@@ -95,9 +96,7 @@ impl Call {
                 } => {
                     reply_id = MsgReplyId::IbcTransferTracking.repr();
 
-                    let Some(local_fallback_address) = fallback_address.clone() else {
-                        return Err(ContractError::FallbackAddressMustBeSetForIbcTracking {});
-                    };
+                    let local_fallback_address = fallback_address.to_owned();
 
                     let amount = if let Some(pointer) = amount_pointer {
                         let amount_field = json_pointer(&mut cosmos_msg, pointer).ok_or(
@@ -153,11 +152,15 @@ impl Call {
                                 .map_err(|_| ContractError::ProtoSerializationError {})?
                                 .into();
 
-                            let mut bytes = Vec::new();
-                            prost::Message::encode(&ibc, &mut bytes)
+                            self.encode_proto_msg(&ibc)?
+                        }
+                        ProtoMessageType::OsmosisSwapExactAmtIn => {
+                            let swap: MsgSwapExactAmountIn = binary_field
+                                .clone()
+                                .deserialize_into::<MsgSwapExactAmountIn>()
                                 .map_err(|_| ContractError::ProtoSerializationError {})?;
 
-                            Binary(bytes)
+                            self.encode_proto_msg(&swap)?
                         }
                     };
 
@@ -187,5 +190,13 @@ impl Call {
 
         *field = serde_cw_value::Value::String(value.to_owned());
         Ok(())
+    }
+
+    fn encode_proto_msg<T: prost::Message>(&self, msg: &T) -> Result<Binary, ContractError> {
+        let mut bytes = Vec::new();
+        prost::Message::encode(msg, &mut bytes)
+            .map_err(|_| ContractError::ProtoSerializationError {})?;
+
+        Ok(Binary(bytes))
     }
 }
