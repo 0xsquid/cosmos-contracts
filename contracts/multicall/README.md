@@ -17,7 +17,8 @@ Executes a set of cosmos messages specified in the calls array
         "msg": {},
         "actions": []
       }
-    ]
+    ],
+    "fallback_address": "<local_fallback_address>",
   }
 }
 ```
