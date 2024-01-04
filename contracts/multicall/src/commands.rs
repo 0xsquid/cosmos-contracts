@@ -159,21 +159,21 @@ pub fn handle_execution_fallback_reply(
 
     let fallback_address = state.fallback_address;
 
+    let mut response = Response::new().add_attributes([
+        ("multicall_execution", "recovered"),
+        ("origin_err", &origin_err),
+    ]);
+
     let recover_funds = deps
         .querier
         .query_all_balances(env.contract.address.as_str())?;
 
-    if recover_funds.is_empty() {
-        return Err(ContractError::RecoveryError {
-            msg: "No funds to recover".to_owned(),
-            origin_err,
+    if !recover_funds.is_empty() {
+        response = response.add_message(BankMsg::Send {
+            to_address: fallback_address,
+            amount: recover_funds,
         });
     }
 
-    Ok(Response::new()
-        .add_message(BankMsg::Send {
-            to_address: fallback_address,
-            amount: recover_funds,
-        })
-        .add_attribute("multicall_execution", "recovered"))
+    Ok(response)
 }
