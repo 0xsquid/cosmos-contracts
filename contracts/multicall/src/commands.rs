@@ -1,5 +1,6 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, DepsMut, Env, MessageInfo, Reply, Response, SubMsg, SubMsgResult, WasmMsg,
+    to_json_binary, BankMsg, DepsMut, Env, MessageInfo, Reply, Response, SubMsg, SubMsgResult,
+    WasmMsg,
 };
 use ibc_tracking::reply::handle_ibc_transfer_reply;
 use shared::SerializableJson;
@@ -43,7 +44,7 @@ pub fn handle_multicall(
     Ok(Response::new().add_submessage(SubMsg::reply_on_error(
         WasmMsg::Execute {
             contract_addr: env.contract.address.to_string(),
-            msg: to_binary(&ExecuteMsg::ProcessNextCall {})?,
+            msg: to_json_binary(&ExecuteMsg::ProcessNextCall {})?,
             funds: vec![],
         },
         MsgReplyId::ExecutionFallback.repr(),
@@ -107,7 +108,7 @@ pub fn handle_call_reply(env: &Env) -> Result<Response, ContractError> {
     // proceed to the next call here
     Ok(Response::new().add_message(WasmMsg::Execute {
         contract_addr: env.contract.address.to_string(),
-        msg: to_binary(&ExecuteMsg::ProcessNextCall {})?,
+        msg: to_json_binary(&ExecuteMsg::ProcessNextCall {})?,
         funds: vec![],
     }))
 }

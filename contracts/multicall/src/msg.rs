@@ -30,7 +30,15 @@ pub enum ExecuteMsg {
 /// This structure describes the query messages of the contract
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum QueryMsg {}
+pub enum QueryMsg {
+    /// ## Description
+    /// Sequentially executes provided queries and returns corresponding responses
+    #[returns(MultiQueryResponse)]
+    MultiQuery {
+        /// list of queries to execute
+        queries: Vec<SerializableJson>,
+    },
+}
 
 /// ## SudoMsg
 /// This structure describes the sudo messages of the contract
@@ -147,4 +155,12 @@ pub enum ProtoMessageType {
     IbcTransfer,
     /// osmosis gamm swap exact amount in type
     OsmosisSwapExactAmtIn,
+}
+
+/// ## MultiQueryResponse
+/// This structure describes the fields for multi query call response
+#[cw_serde]
+pub struct MultiQueryResponse {
+    /// multi query responses
+    pub responses: Vec<SerializableJson>,
 }

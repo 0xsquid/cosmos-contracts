@@ -1,13 +1,15 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
+use cosmwasm_std::{
+    to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult,
+};
 use ibc_tracking::{ibc, msg::IBCLifecycleComplete};
 use shared::SerializableJson;
 
 use crate::{
     commands,
     msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, MsgReplyId, QueryMsg, SudoMsg},
-    ContractError,
+    queries, ContractError,
 };
 
 /// ## Description
@@ -134,9 +136,13 @@ pub fn sudo(deps: DepsMut, _env: Env, msg: SudoMsg) -> Result<Response, Contract
 /// * **_env** is an object of type [`Env`].
 ///
 /// * **_msg** is an object of type [`ExecuteMsg`].
+///
+/// * **QueryMsg::MultiQuery {}** Sequentially executes provided queries and returns corresponding responses
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
-    match msg {}
+pub fn query(deps: Deps<SerializableJson>, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::MultiQuery { queries } => to_json_binary(&queries::multi_query(deps, queries)?),
+    }
 }
 
 /// ## Description

@@ -1,13 +1,15 @@
 use cosmwasm_std::{
-    to_binary, Binary, CosmosMsg, Env, QuerierWrapper, QueryRequest, Storage, SubMsg, Uint128,
+    to_json_binary, Binary, CosmosMsg, Env, QuerierWrapper, QueryRequest, Storage, SubMsg, Uint128,
     WasmQuery,
 };
 use cw20::{BalanceResponse as Cw20BalanceResponse, Cw20QueryMsg};
 use ibc_tracking::{
-    msg::{CwIbcMessage, MsgTransfer},
+    msg::CwIbcMessage,
     state::{store_ibc_transfer_reply_state, IbcTransferReplyState},
 };
-use osmosis_std::types::osmosis::gamm::v1beta1::MsgSwapExactAmountIn;
+use osmosis_std::types::{
+    ibc::applications::transfer::v1::MsgTransfer, osmosis::gamm::v1beta1::MsgSwapExactAmountIn,
+};
 use shared::{util::json_pointer, SerializableJson};
 use std::str::FromStr;
 
@@ -45,7 +47,7 @@ impl Call {
                     let balance = querier
                         .query(&QueryRequest::Wasm(WasmQuery::Smart {
                             contract_addr: contract.to_owned(),
-                            msg: to_binary(&Cw20QueryMsg::Balance {
+                            msg: to_json_binary(&Cw20QueryMsg::Balance {
                                 address: env.contract.address.to_string(),
                             })?,
                         }))
@@ -131,7 +133,7 @@ impl Call {
                         },
                     )?;
 
-                    let binary = to_binary(&binary_field)?;
+                    let binary = to_json_binary(&binary_field)?;
                     self.replace_value(&mut cosmos_msg, replacer, &binary.to_base64())?;
                 }
                 CallAction::FieldToProtoBinary {

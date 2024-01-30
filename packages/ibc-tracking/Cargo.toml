@@ -17,4 +17,4 @@ prost = { workspace = true }
 osmosis-std = { workspace = true }
 schemars = { workspace = true }
 
-osmosis-std-derive = "0.13.2"
+# osmosis-std-derive = "0.20.1"
