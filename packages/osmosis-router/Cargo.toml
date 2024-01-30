@@ -20,4 +20,3 @@ itertools = {workspace = true}
 
 sha2 = "0.10.6"
 hex = "0.4.3"
-# osmosis-std-derive = "0.20.1"

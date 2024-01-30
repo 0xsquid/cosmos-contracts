@@ -3,7 +3,6 @@ use cosmwasm_std::{
 };
 use cw_utils::one_coin;
 use ibc_tracking::{
-    // msg::MsgTransfer,
     state::{store_ibc_transfer_reply_state, IbcTransferReplyState},
     util::insert_callback_key,
 };

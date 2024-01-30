@@ -16,5 +16,3 @@ serde-cw-value = { workspace = true }
 prost = { workspace = true }
 osmosis-std = { workspace = true }
 schemars = { workspace = true }
-
-# osmosis-std-derive = "0.20.1"
