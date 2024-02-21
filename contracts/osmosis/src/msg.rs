@@ -4,7 +4,7 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Coin, Decimal};
 use ibc_tracking::msg::IBCLifecycleComplete;
 use osmosis_router::{OsmosisSimulateSwapResponse, OsmosisSwapMsg};
-use osmosis_std::types::osmosis::gamm::v1beta1::SwapAmountInRoute;
+use osmosis_std::types::osmosis::poolmanager::v1beta1::SwapAmountInRoute;
 use shared::SerializableJson;
 
 #[cw_serde]

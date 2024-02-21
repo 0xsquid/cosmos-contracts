@@ -1,6 +1,6 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{testing::mock_env, to_binary, BankMsg, Coin, CosmosMsg, Uint128, WasmMsg};
-use ibc_tracking::msg::MsgTransfer;
+use cosmwasm_std::{testing::mock_env, to_json_binary, BankMsg, Coin, CosmosMsg, Uint128, WasmMsg};
+use osmosis_std::types::ibc::applications::transfer::v1::MsgTransfer;
 use serde_cw_value::Value;
 
 use crate::{
@@ -406,7 +406,7 @@ fn test_call_into_msg() {
         wasm_msg.msg,
         CosmosMsg::Wasm(WasmMsg::Execute {
             contract_addr: "addr0001".to_owned(),
-            msg: to_binary(&WasmStakeMsg {
+            msg: to_json_binary(&WasmStakeMsg {
                 on_behalf: "addr0002".to_owned(),
                 amount: "1337".to_owned(),
             })
@@ -534,7 +534,7 @@ fn test_call_into_msg() {
             sender: "osmo1vmpds4p8grwz54dygeljhq9vffssw5caydyj3heqd02f2seckk3smlug7w".to_owned(),
             receiver: "axelar15t9awn6jnxheckur5vc6dqv6pqlpph0hw24vwf".to_owned(),
             timeout_height: None,
-            timeout_timestamp: Some(1693856646000000000),
+            timeout_timestamp: 1693856646000000000,
             memo: "{\"ibc_callback\":\"addr0000\"}".to_owned(),
         }
         .into()
@@ -594,7 +594,7 @@ fn test_call_into_msg() {
             sender: "osmo1vmpds4p8grwz54dygeljhq9vffssw5caydyj3heqd02f2seckk3smlug7w".to_owned(),
             receiver: "axelar15t9awn6jnxheckur5vc6dqv6pqlpph0hw24vwf".to_owned(),
             timeout_height: None,
-            timeout_timestamp: Some(1693856646000000000),
+            timeout_timestamp: 1693856646000000000,
             memo: "{\"ibc_callback\":\"addr0000\"}".to_owned(),
         }
         .into()
@@ -681,9 +681,8 @@ mod mock_querier {
     use cosmwasm_schema::cw_serde;
     use cosmwasm_std::testing::{MockApi, MockQuerier, MockStorage, MOCK_CONTRACT_ADDR};
     use cosmwasm_std::{
-        from_binary, from_slice, to_binary, BalanceResponse, BankQuery, Coin, ContractResult,
-        OwnedDeps, Querier, QuerierResult, QueryRequest, SystemError, SystemResult, Uint128,
-        WasmQuery,
+        from_json, to_json_binary, BalanceResponse, BankQuery, Coin, ContractResult, OwnedDeps,
+        Querier, QuerierResult, QueryRequest, SystemError, SystemResult, Uint128, WasmQuery,
     };
     use cw20::{BalanceResponse as Cw20BalanceResponse, Cw20QueryMsg};
     use shared::SerializableJson;
@@ -720,7 +719,7 @@ mod mock_querier {
     impl Querier for WasmMockQuerier {
         fn raw_query(&self, bin_request: &[u8]) -> QuerierResult {
             // MockQuerier doesn't support Custom, so we ignore it completely here
-            let request: QueryRequest<SerializableJson> = match from_slice(bin_request) {
+            let request: QueryRequest<SerializableJson> = match from_json(bin_request) {
                 Ok(v) => v,
                 Err(e) => {
                     return SystemResult::Err(SystemError::InvalidRequest {
@@ -738,7 +737,7 @@ mod mock_querier {
             match &request {
                 QueryRequest::Bank(BankQuery::Balance { denom, .. }) => match denom.as_str() {
                     "usquid" => {
-                        SystemResult::Ok(ContractResult::from(to_binary(&BalanceResponse {
+                        SystemResult::Ok(ContractResult::from(to_json_binary(&BalanceResponse {
                             amount: Coin {
                                 denom: "usquid".to_owned(),
                                 amount: Uint128::from(333u128),
@@ -746,7 +745,7 @@ mod mock_querier {
                         })))
                     }
                     "uzero" => {
-                        SystemResult::Ok(ContractResult::from(to_binary(&BalanceResponse {
+                        SystemResult::Ok(ContractResult::from(to_json_binary(&BalanceResponse {
                             amount: Coin {
                                 denom: "uzero".to_owned(),
                                 amount: Uint128::zero(),
@@ -757,18 +756,18 @@ mod mock_querier {
                 },
                 QueryRequest::Wasm(WasmQuery::Smart { contract_addr, msg }) => {
                     match contract_addr.as_str() {
-                        "cw20" => match from_binary(msg).unwrap() {
+                        "cw20" => match from_json(msg).unwrap() {
                             Cw20QueryMsg::Balance { .. } => SystemResult::Ok(ContractResult::Ok(
-                                to_binary(&Cw20BalanceResponse {
+                                to_json_binary(&Cw20BalanceResponse {
                                     balance: Uint128::from(1337u128),
                                 })
                                 .unwrap(),
                             )),
                             _ => panic!("query not mocked"),
                         },
-                        "fee" => match from_binary(msg).unwrap() {
+                        "fee" => match from_json(msg).unwrap() {
                             CustomQueryTestMsg::Fee {} => SystemResult::Ok(ContractResult::Ok(
-                                to_binary(&TestFeeResponse {
+                                to_json_binary(&TestFeeResponse {
                                     denom: "ufee".to_owned(),
                                     fee: Uint128::from(1312u128),
                                 })

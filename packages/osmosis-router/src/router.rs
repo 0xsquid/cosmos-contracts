@@ -4,8 +4,9 @@ use cosmwasm_std::{
     Coin, CosmosMsg, Decimal, Deps, Env, Reply, Storage, SubMsgResponse, SubMsgResult, Uint128,
 };
 use osmosis_std::types::osmosis::gamm::v1beta1::{
-    MsgSwapExactAmountIn, MsgSwapExactAmountInResponse, SwapAmountInRoute,
+    MsgSwapExactAmountIn, MsgSwapExactAmountInResponse,
 };
+use osmosis_std::types::osmosis::poolmanager::v1beta1::SwapAmountInRoute;
 
 use crate::{
     error::OsmosisRouterError,

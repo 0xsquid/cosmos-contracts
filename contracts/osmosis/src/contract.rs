@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult,
+    to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult,
 };
 use ibc_tracking::msg::IBCLifecycleComplete;
 use ibc_tracking::{ibc, reply as ibc_tracking_reply};
@@ -93,7 +93,7 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
             input_coin,
             path,
             slippage,
-        } => to_binary(
+        } => to_json_binary(
             &osmosis_router::router::estimate_min_twap_output(
                 deps, &env, input_coin, path, slippage,
             )

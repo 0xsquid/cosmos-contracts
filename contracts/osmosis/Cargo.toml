@@ -34,7 +34,7 @@ osmosis-router = { version = "1.2.0", path = "../../packages/osmosis-router" }
 ibc-tracking = { version = "1.2.0", path = "../../packages/ibc-tracking" }
 shared = { version = "1.2.0", path = "../../packages/shared" }
 
-osmosis-std-derive = "0.13.2"
+osmosis-std-derive = "0.20.1"
 
 [dev-dependencies]
 cw-multi-test = { workspace = true }

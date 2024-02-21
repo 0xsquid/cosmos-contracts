@@ -1,9 +1,8 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, DepsMut, Env, MessageInfo, Reply, Response, StdError, SubMsg, WasmMsg,
+    to_json_binary, BankMsg, DepsMut, Env, MessageInfo, Reply, Response, StdError, SubMsg, WasmMsg,
 };
 use cw_utils::one_coin;
 use ibc_tracking::{
-    msg::MsgTransfer,
     state::{store_ibc_transfer_reply_state, IbcTransferReplyState},
     util::insert_callback_key,
 };
@@ -11,6 +10,7 @@ use osmosis_router::{
     router::{build_swap_msg, get_swap_amount_out_response},
     OsmosisSwapMsg,
 };
+use osmosis_std::types::ibc::applications::transfer::v1::MsgTransfer;
 
 use crate::{
     msg::{AfterSwapAction, ExecuteMsg, MsgReplyId, MultiSwapMsg},
@@ -51,7 +51,7 @@ pub fn handle_swap_with_action(
     Ok(Response::new().add_submessage(SubMsg::reply_always(
         WasmMsg::Execute {
             contract_addr: env.contract.address.to_string(),
-            msg: to_binary(&ExecuteMsg::ProcessSwap { swap_msg })?,
+            msg: to_json_binary(&ExecuteMsg::ProcessSwap { swap_msg })?,
             funds: info.funds.clone(),
         },
         MsgReplyId::SwapWithActionFallback.repr(),
@@ -94,7 +94,7 @@ pub fn handle_after_swap_action(
         } => {
             let wasm = WasmMsg::Execute {
                 contract_addr: contract_address,
-                msg: to_binary(&msg)?,
+                msg: to_json_binary(&msg)?,
                 funds: vec![output_token_info.output_coin],
             };
             Response::new().add_message(wasm)
@@ -117,7 +117,7 @@ pub fn handle_after_swap_action(
                 sender: env.contract.address.to_string(),
                 receiver,
                 timeout_height: None,
-                timeout_timestamp: Some(env.block.time.plus_seconds(IBC_PACKET_LIFITIME).nanos()),
+                timeout_timestamp: env.block.time.plus_seconds(IBC_PACKET_LIFITIME).nanos(),
                 memo,
             };
 
@@ -164,7 +164,7 @@ pub fn handle_multiswap(
     Ok(Response::new().add_submessage(SubMsg::reply_always(
         WasmMsg::Execute {
             contract_addr: env.contract.address.to_string(),
-            msg: to_binary(&ExecuteMsg::ProcessMultiSwap {})?,
+            msg: to_json_binary(&ExecuteMsg::ProcessMultiSwap {})?,
             funds: vec![],
         },
         MsgReplyId::MultiSwapFallback.repr(),
@@ -203,7 +203,7 @@ pub fn handle_multiswap_reply(
 
     let swap_msg = WasmMsg::Execute {
         contract_addr: env.contract.address.to_string(),
-        msg: to_binary(&ExecuteMsg::ProcessSwap {
+        msg: to_json_binary(&ExecuteMsg::ProcessSwap {
             swap_msg: next_swap.swap_msg,
         })?,
         funds: vec![next_swap.amount_in],

@@ -4,7 +4,7 @@ use std::ops::{Div, Mul};
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Decimal, QuerierWrapper, Timestamp, Uint128};
 use error::OsmosisRouterError;
-use osmosis_std::types::osmosis::gamm::v1beta1::SwapAmountInRoute;
+use osmosis_std::types::osmosis::poolmanager::v1beta1::SwapAmountInRoute;
 use osmosis_std::{
     shim::Timestamp as OsmosisTimestamp, types::osmosis::twap::v1beta1::TwapQuerier,
 };
