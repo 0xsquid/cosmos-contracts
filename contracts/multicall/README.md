@@ -313,3 +313,12 @@ Second - since `msg` field in a wasm call must be a base64 encoded Binary object
 ```
 
 Note: since there is no updates for wasm message field it can be alredy specified as a binary value. Here it is shown for explanaition purposes.
+
+## Mainnet deployment config
+
+Store wasm: https://www.mintscan.io/osmosis/tx/AE7E17CFA2DF0D9B7300CBB3580AF468AEE9C1DDAE8890FD1B79BF290A4EEBA7/?height=13998652
+Code Id `555`
+
+Contract creation: https://www.mintscan.io/osmosis/tx/BD7B7179F697B8E29C7D7B0F017E7D94C2C3513B09887AD47DFB78BB085B0B59/?height=13998691
+
+Contract address: `osmo1n6ney9tsf55etz9nrmzyd8wa7e64qd3s06a74fqs30ka8pps6cvqtsycr6`
